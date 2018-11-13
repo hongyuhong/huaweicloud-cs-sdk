@@ -20,6 +20,7 @@
 ####  1. 进入CS控制台
 - 直接进入 [**CS控制台**](https://console.huaweicloud.com/cs/?region=cn-north-1#/overview)
 - [华为云官网](http://www.huaweicloud.com) -> 产品 -> [EI企业智能](https://www.huaweicloud.com/ei/) -> [实时流计算服务](https://www.huaweicloud.com/product/cs.html)，进入实时流计算的首页后，点击`立即使用`
+- 首次进入时，会要求进行权限委托以访问其他服务，若是主账号，直接点击前往授权即可，若是子账号，则前往主账号进行授权。
 
 
 
@@ -47,9 +48,9 @@
    - channel = "csinput"      # 在DIS中新建的通道名称，**[新建DIS通道见这里](https://console.huaweicloud.com/dis/?region=cn-north-1#/manage/instanceList)**
    - partition_count = "1",   # 在DIS中通道的分区数
    - encode = "csv",            #  数据格式，CSV
-   - field_delimiter = ","       #  行数据风格符，默认逗号分隔
+   - field_delimiter = ","       #  行数据分隔符，默认逗号分隔
 2. sink输出源：
-   - type = "smn"                # SMN为简单消息服务，步骤：1. [新建SMN通道](https://console.huaweicloud.com/smn/?region=cn-north-1#/smn/manager/topic)，得到URN（下面的topic_urn）和主题名（下面的message_subject）; 2. [添加订阅](https://console.huaweicloud.com/smn/?region=cn-north-1#/smn/manager/subscription)
+   - type = "smn"                # SMN为简单消息服务，步骤：1. [新建SMN主题](https://console.huaweicloud.com/smn/?region=cn-north-1#/smn/manager/topic)，得到URN（下面的topic_urn）和主题名（下面的message_subject）; 2. [添加订阅](https://console.huaweicloud.com/smn/?region=cn-north-1#/smn/manager/subscription)
    - region = "cn-north-1"   # 分区，默认华北区
    - topic_urn = "urn:smn:cn-north-1:ac538675aa074ff18d5f3224abeec213:cs-test"    # 见SMN中主题的URN列
    - message_subject = "cs-test"                      # SMN主题名
@@ -114,14 +115,14 @@ DIS Agent使用方法：
 2. [下载DIS Agent](https://dis-publish.obs-website.cn-north-1.myhwclouds.com/dis-agent-1.1.0.zip)
 3. 本地解压
 4. 修改`conf/agent.yml`
-5. 启动`DIS Agent`: `bin/start-dis-agent.sh`
+5. 启动`DIS Agent`: `bin/start-dis-agent.sh`，若是Windows系统，则启动`bin/start-dis-agent.bat`
 
 ```yaml
 ---
 # 不变。
 region: cn-north-1
 # user ak (get from 'My Credential')
-ak: 填写你的AK
+ak: 填写你的AK 进入console控制台->右上角 我的账号 选择"我的凭证"-> "管理访问密钥"
 # user sk (get from 'My Credential')
 sk: 填写你的SK
 # user project id (get from 'My Credential')
@@ -130,9 +131,9 @@ projectId: 填写region所在的project id。进入console控制台->右上角 �
 endpoint: https://dis.cn-north-1.myhwclouds.com:20004
 # config each flow to monitor file.
 flows:
-  # DIS stream
+  # DIS通道
   - DISStream: csinput
-    # only support specified directory, filename can use * to match some files. eg. * means match all file, test*.log means match test1.log or test-12.log and so on.
+    # 填写数据文件所在路径，only support specified directory, filename can use * to match some files. eg. * means match all file, test*.log means match test1.log or test-12.log and so on.
     filePattern: /Users/admin/h/dis-agent-1.0.4/data/*.log
     # from where to start: 'START_OF_FILE' or 'END_OF_FILE'
     initialPosition: START_OF_FILE
@@ -144,7 +145,7 @@ flows:
 
 ####  发送DIS数据
 
-本地用写个小程序，向文件中追加数据，这里使用的guava的files库。
+本地用写个小程序，示例代码（scala）如下，往数据文件中追加数据，这里使用的guava的files库。
 
 ```scala
 import java.io.File
